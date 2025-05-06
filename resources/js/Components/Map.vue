@@ -29,7 +29,6 @@ import { ref, watch } from "vue";
 import PointCard from "@/Components/PointCard.vue";
 import useUserLocation from "@/Utils/useUserLocation.js";
 import axios from "axios";
-import { info } from "autoprefixer";
 
 const props = defineProps({
   center: {

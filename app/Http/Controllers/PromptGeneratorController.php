@@ -16,7 +16,7 @@ class PromptGeneratorController extends Controller
         $lon = $request->input('lon');
 
         $prompt = <<<EOT
-Tu es un expert en environnement. Voici des coordonnées : latitude $lat, longitude $lon.
+Tu es un expert en environnement. Voici des coordonnées : latitude $lat, longitude $lon, dans un rayon de 10km.
 
 Donne-moi les 3 éléments suivants concernant une catastrophe écologique historique proche de cet endroit :
 1. Un titre court et marquant
@@ -29,6 +29,8 @@ Réponds exactement au format JSON :
   "Anecdote ici",
   "Préventif ici"
 ]
+
+Si tu ne trouve rien renvoie moi qu'il n'y a rien dans un rayon de 10km.
 EOT;
 
         $response = Http::withHeaders([

@@ -7,11 +7,11 @@ use Inertia\Inertia;
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
-        'prompt' => fn () => '',
-        'canLogin' => fn () => Route::has('login'),
-        'canRegister' => fn () => Route::has('register'),
-        'laravelVersion' => fn () => Application::VERSION,
-        'phpVersion' => fn () => PHP_VERSION,
+        'prompt' => fn() => '',
+        'canLogin' => fn() => Route::has('login'),
+        'canRegister' => fn() => Route::has('register'),
+        'laravelVersion' => fn() => Application::VERSION,
+        'phpVersion' => fn() => PHP_VERSION,
     ]);
 });
 
@@ -23,4 +23,4 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';

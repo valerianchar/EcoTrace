@@ -12,48 +12,48 @@ class PromptGeneratorController extends Controller
      */
     public function __invoke(Request $request)
     {
-        if (!$request->input('lat') || !$request->input('lon')) {
-            return response()->json(['error' => 'No data found'], 400);
-        }
         $lat = $request->input('lat');
         $lon = $request->input('lon');
 
-        $prompt = "Tu es un expert en environnement. Donne-moi ces trois éléments sur une catastrophe écologique proche des coordonnées $lat, $lon :
-1. Un titre accrocheur
-2. Une anecdote marquante liée à la catastrophe
-3. Un message préventif.
+        $prompt = <<<EOT
+Tu es un expert en environnement. Voici des coordonnées : latitude $lat, longitude $lon.
 
-Formate la réponse strictement ainsi :
+Donne-moi les 3 éléments suivants concernant une catastrophe écologique historique proche de cet endroit :
+1. Un titre court et marquant
+2. Une anecdote sur la catastrophe
+3. Un message préventif pour l’avenir
+
+Réponds exactement au format JSON :
 [
-  \"Titre\",
-  \"Anecdote\",
-  \"Préventif\"
-]";
+  "Titre ici",
+  "Anecdote ici",
+  "Préventif ici"
+]
+EOT;
 
         $response = Http::withHeaders([
-            'x-api-key' => env('ANTHROPIC_API_KEY'),
-            'content-type' => 'application/json',
-            'anthropic-version' => '2023-06-01',
-        ])->post('https://api.anthropic.com/v1/messages', [
-                    'model' => 'claude-3-opus-20240229',
-                    'max_tokens' => 500,
-                    'temperature' => 0.7,
+            'Authorization' => 'Bearer ' . env('MISTRAL_API_KEY'),
+            'Content-Type' => 'application/json',
+        ])->post('https://api.mistral.ai/v1/chat/completions', [
+                    'model' => 'mistral-large-latest',
                     'messages' => [
-                        ['role' => 'user', 'content' => $prompt],
+                        [
+                            'role' => 'user',
+                            'content' => $prompt,
+                        ]
                     ],
+                    'temperature' => 0.7,
+                    'max_tokens' => 500,
                 ]);
 
-        dd($response->json());
-        $content = $response->json()['content'][0]['text'] ?? null;
+        $text = $response->json()['choices'][0]['message']['content'] ?? null;
 
-        if ($content) {
-            // Essaie d'extraire le tableau JSON de la réponse
-            $matches = [];
-            preg_match('/\[(.*?)\]/s', $content, $matches);
-            $json = isset($matches[0]) ? $matches[0] : '[]';
-            //            return response()->json(json_decode($json, true));
+        // Tente d'extraire un tableau JSON
+        if (preg_match('/\[(.*?)\]/s', $text, $matches)) {
+            $json = "[" . $matches[1] . "]";
             return response()->json(json_decode($json, true));
         }
-        return response()->json(['error' => 'Réponse invalide'], 500);
+
+        return response()->json(['error' => 'Réponse non valide'], 500);
     }
 }

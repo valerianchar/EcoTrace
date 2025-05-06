@@ -12,7 +12,11 @@
 
       <LMarker v-if="clickedPosition" :lat-lng="clickedPosition">
         <LPopup>
-          <PointCard />
+          <PointCard
+            :title="infoClickedPosition[0]"
+            :description="infoClickedPosition[1]"
+            :info="infoClickedPosition[2]"
+          />
         </LPopup>
       </LMarker>
     </LMap>
@@ -24,8 +28,8 @@ import { LMap, LTileLayer, LMarker, LPopup } from "@vue-leaflet/vue-leaflet";
 import { ref, watch } from "vue";
 import PointCard from "@/Components/PointCard.vue";
 import useUserLocation from "@/Utils/useUserLocation.js";
-import { router } from "@inertiajs/vue3";
 import axios from "axios";
+import { info } from "autoprefixer";
 
 const props = defineProps({
   center: {
@@ -45,6 +49,7 @@ const attribution = "&copy; OpenStreetMap contributors";
 
 //Cliked Position
 const clickedPosition = ref(null);
+const infoClickedPosition = ref(null);
 
 const updateMarkerPosition = (event) => {
   const { latlng } = event;
@@ -53,6 +58,7 @@ const updateMarkerPosition = (event) => {
 };
 
 const refreshPrompt = async (latlng) => {
+  infoClickedPosition.value = null;
   await axios
     .post(
       route("promptGenerator", {
@@ -61,7 +67,7 @@ const refreshPrompt = async (latlng) => {
       })
     )
     .then((reponse) => {
-      console.log(reponse);
+      infoClickedPosition.value = reponse.data;
     });
 };
 

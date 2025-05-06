@@ -20,7 +20,7 @@
 </template>
 
 <script setup>
-import { LMap, LTileLayer, LMarker } from '@vue-leaflet/vue-leaflet'
+import {LMap, LTileLayer, LMarker} from '@vue-leaflet/vue-leaflet'
 import {ref, watch} from "vue";
 import useUserLocation from "@/Utils/useUserLocation.js";
 
